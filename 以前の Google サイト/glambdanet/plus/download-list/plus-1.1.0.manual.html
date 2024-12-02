@@ -1,0 +1,2736 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+Copyright 2003, 2004, 2005, 2006, 2007, 2008 Grid Technology Research Center,
+National Institute of Advanced Industrial Science and Technology
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>PluS User's Manual</title>
+</head>
+<body>
+<h1 style="text-align: center;"><a href="http://www.g-lambda.net/plus/">PluS</a>
+User's Manual</h1>
+17-Oct-2006&nbsp;&nbsp;&nbsp; Initial release<br>
+19-Dec-2006&nbsp;&nbsp;&nbsp; Update resource specification of
+plus_reserve, add plus_account, ClassAd configuration etc.<br>
+01-Mar-2007&nbsp;&nbsp; Update some path information.<br>
+30-Sep-2007&nbsp;&nbsp; Add description for SGE 6.1u2.<br>
+31-Mar-2008&nbsp;&nbsp; Add description for Java 1.6, SGE 6.1u3, and sge_operatord.
+<h1>Table of Contents</h1>
+<ul>
+  <li><a href="#1._Overview_and_Installation">1. Overview and
+Installation</a><br>
+    <ul>
+      <li><a href="#Overview">1.1 Overview</a></li>
+      <li><a href="#Directory_configuration_and_main">1.2 Directory
+configuration and main contents</a> </li>
+      <li><a href="#Operating_Environment">1.3 Operating environment</a></li>
+      <li> <a href="#Setup">1.4 Setup</a></li>
+    </ul>
+  </li>
+  <li><a href="#2._How_to_use_PluS">2. How to use PluS</a><br>
+  <ul>
+    <li> <a href="#Startup_and_termination">2.1 Startup and termination</a>
+    </li>
+    <li> <a href="#Reservation_management_command_note">2.2
+Reservation management
+command note</a></li>
+    <li><a href="manual.html#Reservation_management_command">2.3
+Reservation
+management commands</a>
+    <ul>
+      <li><a href="#2.3.1_Registering_reservations">2.3.1 Registering
+reservations</a></li>
+      <li><a href="#2.3.2_Viewing_reservation_information">2.3.2
+Viewing reservation information</a></li>
+      <li><a href="#2.3.3_Canceling_reservations">2.3.3 Canceling
+reservations</a></li>
+      <li><a href="#2.3.4_Changing_reservations">2.3.4 Changing
+reservations</a></li>
+      <li><a href="#2.3.5_Confirming_the_number_of_nodes">2.3.5
+Confirming the number of nodes available for reservations</a></li>
+      <li><a href="#2.3.6_Discarding_reservations">2.3.6 Discarding
+reservations</a></li>
+      <li><a href="#2.3.7_Confirming_reservation_operations">2.3.7
+Confirming reservation operations</a></li>
+      <li><a href="#2.3.8_Discarding_reservation_operations">2.3.8
+Discarding reservation operations</a></li>
+      <li><a href="#2.3.9_Viewing_account_of_reservation">2.3.9 Viewing
+account of reservation usage</a></li>
+    </ul></li>
+    <li><a href="#Restrictions_on_reservation_transactions">2.4
+Restrictions
+on reservation transactions</a></li>
+    <li> <a href="#Submitting_jobs_to_reservations">2.5 Submitting
+jobs to
+reservations</a> </li>
+    <li> <a href="#Reservation_and_job_execution">2.6 Reservation and
+job
+execution</a></li>
+  </ul>
+  </li>
+  <li><a href="#3._Internal_description">3. Internal description</a><br>
+  <ul>
+    <li> <a href="#Operation_descriptions_of_SGE_queue_base">3.1
+Operation
+descriptions of the SGE queue base version</a></li>
+    <li><a href="manual.html#Job_scheduling_algorithm">3.2 Job
+scheduling
+algorithm</a></li>
+    <li> <a href="#Torque_scheduler_settings_and">3.3 Torque scheduler
+settings and corresponding PluS settings</a></li>
+    <li><a href="#3.4_Node_reservability_configuration_by">3.4 Node
+reservability configuration by ClassAd</a>
+    <ul>
+      <li><a href="#3.4.1_Abstract">3.4.1 Abstract</a></li>
+      <li><a href="#3.4.2_Special_variables_for_PluS">3.4.2 Special
+variables for PluS</a></li>
+      <li><a href="#3.4.3_Node_information_struct">3.4.3 Node
+information
+struct</a></li>
+      <li><a href="#3.4.4_Reservability_check_flow">3.4.4 Reservability
+check flow</a></li>
+      <li><a href="#3.4.5_Sample_ClassAd_definitions">3.4.5 Sample
+ClassAd
+definitions</a></li>
+    </ul></li>
+    <li><a href="#Files_related_to_execution">3.5 Files related to
+execution</a></li>
+    <li> <a href="#Improvements_of_Torque_authentication">3.6
+Improvements of the Torque authentication program</a> </li>
+    <li><a href="#sge_operatord">3.7 sge_operatord</a>
+    <ul>
+       <li><a href="#sge_operatord_abstract">3.7.1 abstract</a></li>
+       <li><a href="#sge_operatord_protocol">3.7.2 protocol</a></li>
+    </ul>
+  </ul>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+Copyright 2003, 2004, 2005, 2006, 2007, 2008 <a
+ href="http://projects.gtrc.aist.go.jp/en/">Grid Technology Research
+Center</a>,<br>
+<a href="http://www.aist.go.jp/index_en.html">National Institute of
+Advanced Industrial Science and Technology</a><br>
+<br>
+Licensed under the Apache License, Version 2.0 (the "License");<br>
+you may not use this file except in compliance with the License.<br>
+You may obtain a copy of the License at<br>
+<br>
+&nbsp;&nbsp;&nbsp; <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a><br>
+<br>
+Unless required by applicable law or agreed to in writing, software<br>
+distributed under the License is distributed on an "AS IS" BASIS,<br>
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>
+See the License for the specific language governing permissions and<br>
+limitations under the License.<br>
+<hr style="width: 100%; height: 2px;">
+This work is partly funded by the Science and Technology<br>
+Promotion Program's "Optical Paths Network Provisioning<br>
+based on Grid Technologies" of <a
+ href="http://www.mext.go.jp/english/index.htm">MEXT</a>, Japan.<br>
+<hr style="width: 100%; height: 2px;">
+This product includes software from the Condor (r) Project
+(<a href="http://www.condorproject.org/">http://www.condorproject.org/</a>)
+<hr style="width: 100%; height: 2px;">
+<h1><a name="1._Overview_and_Installation"></a>1. Overview and
+Installation</h1>
+<h2><a name="Overview"></a>1.1 Overview</h2>
+PluS is a reservation manager that can work with <a
+ href="http://www.clusterresources.com/pages/products/torque-resource-manager.php">TORQUE</a>
+(PBS) and <a href="http://gridengine.sunsource.net/">Grid Engine</a>.
+It provides Advance Reservation capability, which is essential to perform
+co-allocation with other resources on the Grid.
+
+One of the following operations will be performed based on the startup
+option.
+<ul>
+  <li>SGE queue base version
+  <ul>
+    <li>The SGE scheduler is not replaced, and the reservation function
+is realized simply by managing the reservation queues.</li>
+    <li>Easy to set up.</li>
+  </ul></li>
+  <li>SGE self scheduling version
+  <ul>
+    <li>The whole SGE scheduler is replaced, and the reservation
+management function and the job scheduling function based on it are
+realized.</li>
+    <li>SGE itself needs to be built, and setup procedures are time
+consuming.</li>
+    <li>Some of the SGE scheduling functions are not supported.</li>
+  </ul></li>
+  <li>TORQUE self scheduling version
+  <ul>
+    <li>The whole TORQUE scheduler is replaced, and the reservation
+management function and the job scheduling function based on it are
+realized.</li>
+    <li>Some of the TORQUE scheduling functions are not supported.</li>
+  </ul></li>
+</ul>
+<h2><a name="Directory_configuration_and_main"></a>1.2 Directory
+configuration and main contents</h2>
+<table style="text-align: left;" border="0" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td>build.xml</td>
+      <td>Build file for Java 1.6.x (JAXB is internal library of Java).</td>
+    </tr>
+    <tr>
+      <td>build-for-Java15.xml</td>
+      <td>Build file for Java 1.5.x (JAXB is external library).</td>
+    </tr>
+    <tr>
+      <td>plus.jar</td>
+      <td>Scheduler JAR file (Create after building)</td>
+    </tr>
+    <tr>
+      <td>bin/</td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_scheduler</td>
+      <td>Startup script for this scheduler</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_schedkill</td>
+      <td>Termination script for this scheduler</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_reserve</td>
+      <td>Script for making reservations</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_modify</td>
+      <td>Script for changing reservations</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_cancel</td>
+      <td>Script for canceling reservations</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_destroy</td>
+      <td>Script for discarding reservations</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_availnodes</td>
+      <td>Script for confirming the number of nodes available for
+reservations</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_commit</td>
+      <td>Reservation transaction confirmation script</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_abort</td>
+      <td>Reservation transaction discarding script</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_status</td>
+      <td>Script for show current reservation status</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_account</td>
+      <td>Script for report and account for PluS reservation usage</td>
+    </tr>
+    <tr>
+      <td>&nbsp; plus_simplefifo</td>
+      <td>Startup script for simple fifo scheduler (only supports job scheduling, not reservation).</td>
+    </tr>
+    <tr>
+      <td>&nbsp; sge_plus.in</td>
+      <td>Template of sge_plus</td>
+    </tr>
+    <tr>
+      <td>&nbsp; sge_plus</td>
+      <td>Script for start/stop PluS,
+using at /etc/init.d on Linux system (Created when building)</td>
+    </tr>
+    <tr>
+      <td>build/</td>
+      <td>Working directory for package build (Created when building)</td>
+    </tr>
+    <tr>
+      <td>src/jp/aist/gtrc/plus/</td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; command/</td>
+      <td>Reservation management command related source (Java)</td>
+    </tr>
+    <tr>
+      <td>&nbsp; scheduler/</td>
+      <td>Scheduler related source (Java, partially C language and
+shell scripts)</td>
+    </tr>
+    <tr>
+      <td>&nbsp; reserve/</td>
+      <td>Reservation management mechanism related source (Java)</td>
+    </tr>
+    <tr>
+      <td>doc/</td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; html/manual.html</td>
+      <td>User Manual (in English), this file.</td>
+    </tr>
+    <tr>
+      <td>&nbsp; db4o.license.txt</td>
+      <td>GPLv2 license file (for db4objects)</td>
+    </tr>
+    <tr>
+      <td>&nbsp; Apache.license.txt</td>
+      <td>Apache license file (for log4j)</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp; condor.license.txt<br>
+      </td>
+      <td style="vertical-align: top;">Condor license file (for
+classad.jar)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; pbs/TorqueProtocol.txt</td>
+      <td>TORQUE (PBS) protocol description (in Japanese, UTF-8)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; sge/gdi-manual.txt</td>
+      <td>GDI (Gridengine Database Interface) API description (in
+Japanese, UTF-8)<br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; sge/XMLsample.txt</td>
+      <td>XML output example of SGE data by sge_operatord<br>
+      </td>
+    </tr>
+    <tr>
+      <td>lib/</td>
+      <td><br>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp; db4o-5.?-java5.jar</td>
+      <td>db4objects ver 5.? library for Java 5.0. See <a
+ href="http://www.db4o.com/">http://www.db4o.com/</a></td>
+    </tr>
+    <tr>
+      <td>&nbsp; log4j-1.2.13.jar</td>
+      <td>Apache Log4j library. See <a
+ href="http://logging.apache.org/">http://logging.apache.org/</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp; classad.jar<br>
+      </td>
+      <td style="vertical-align: top;">ClassAd library from Condor. See
+      <a href="http://www.cs.wisc.edu/condor/classad/">http://www.cs.wisc.edu/condor/classad/</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">conf/<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp; log4j.properties<br>
+      </td>
+      <td style="vertical-align: top;">template configuration of log4j<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp; reservable.ad.sample*<br>
+      </td>
+      <td style="vertical-align: top;">sample file of reservable.ad,
+see <a href="#3.4_Node_reservability_configuration_by">here</a>.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp; sched_conf.sample<br>
+      </td>
+      <td style="vertical-align: top;">sample file of sched_conf, see <a
+ href="#Job_scheduling_algorithm">here</a>.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h2><a name="Operating_Environment"></a>1.3 Operating Environment</h2>
+<ul>
+  <li>SGE
+  <ul>
+    <li>SGE 6.x is supported.
+    <ul>
+      <li>Operations of SGE have been verified with 6.0u8, 6.0u9, 6.1u2 and 6.1u3.</li>
+      <li>NOTE: qstat of SGE 6.0u6 has BUG! Use SGE 6.0u8 or later.</li>
+      <li>We are using <a href="http://gridengine.sunsource.net/">Grid
+Engine</a>, not testing with <a
+ href="http://www.sun.com/software/gridware/">SUN N1 Grid Engine</a>.<br>
+      </li>
+    </ul></li>
+    <li>SGE 5.3 is not supported. No plans to support.</li>
+  </ul></li>
+  <li>TORQUE (PBS)
+  <ul>
+    <li>Operations of TORQUE have been verified with 1.2.0p4, 2.0.0p5,
+2.1.0p0, 2.1.1, 2.1.3, 2.1.6.</li>
+    <li>Operations on OpenPBS have not been verified. Fundamentally, it
+is equivalent to TORQUE, and possibly operates.</li>
+    <li>Cannot be used as a scheduler of PBSPro.</li>
+  </ul></li>
+  <li>Java, ant<br>
+  <ul>
+    <li>Java compiler must be 1.5.0 or later. Previous compilers are
+not supported.</li>
+    <li>Java 1.6.0 is our default compiler.</li>
+    <li>You can build PluS for Java 1.5.x by 'ant -f build-for-Java15.xml'.</li>
+    <li>ant is necessary to build.<br>
+    </li>
+  </ul>
+  </li>
+  <li>OS, CPU arch
+  <ul>
+    <li>Linux 2.6.x on Intel x86 is mainly supported.</li>
+    <li>Others have not fully tested yet. Maybe work.<br>
+    </li>
+  </ul></li>
+</ul>
+<h2><a name="Setup"></a>1.4 Setup</h2>
+Conduct step [1] first, then perform steps [2] to [4] based on the PluS
+startup mode.<br>
+<h3>[1] &lt;Essential&gt; Compile installation of the Java scheduler
+and reservation commands</h3>
+In the directory where build.xml is stored, execute the following.<br>
+&nbsp;&nbsp;&nbsp; % ant<br>
+&nbsp;&nbsp;&nbsp; % sudo ant install<br>
+&nbsp; <br>
+At this point, various scripts are copied to /usr/local/bin, plus.jar,
+db4o-xxx.jar, etc are copied to /usr/local/PluS.<br>
+&nbsp; <br>
+To change the installation directory, change the command as follows:<br>
+&nbsp;&nbsp;&nbsp; % ant -Dinstall.bin.dir=/myhome/bin
+-Dinstall.jar.dir=/myhome/jars install<br>
+Also, you can edit the first part of build.xml as necessary.<br>
+Directory names in the script file will be overwritten during the build.<br>
+When build.xml is changed, execute ant clean first.<br>
+&nbsp; <br>
+Define the path to java and install.bin.dir if needed.<br>
+<br>
+<h3>[2] &lt;Only when using the SGE queue base version&gt;Setting of
+sudoers and SGE</h3>
+Set so that the PluS scheduler can execute the qresub command in sudo
+without a password.<br>
+For example, execute <span
+ style="font-family: courier new,courier,monospace;">sudo visudo</span>,
+and add a line such as <br>
+&nbsp;&nbsp;&nbsp; plus ALL=(ALL) NOPASSWD:
+/opt/gridengine/bin/lx26-x86/qresub.<br>
+At this point, define the PluS scheduler starter as &#8220;plus&#8221;.<br>
+<!--
+&nbsp;&nbsp;&nbsp; <br>
+In addition, specify the default job input queue so that no
+non-reservation jobs can be input in the reservation queue. <br>
+Restart
+sge_qmaster after writing <span
+ style="font-family: times new roman,times,serif;">-q all.q</span> in
+$SGE_ROOT/default/common/sge_request.<br>
+It is better to list the queue names displayed by <span
+ style="font-family: courier new,courier,monospace;">qconf -sql</span>
+with a ","
+delimiter, such as<span
+ style="font-family: times new roman,times,serif;"> -q A.q,B.q,C.q</span>.<br>
+-->
+&nbsp;&nbsp;&nbsp; <br>
+Add the PluS scheduler starter (e.g. plus) to the manager group of SGE.<br>
+Since the queue operation requires Manager right, use <span
+ style="font-family: courier new,courier,monospace;">sudo qconf -am
+plus</span>.<br>
+Confirm the user names which are displayed by <span
+ style="font-family: courier new,courier,monospace;">qconf -sm</span>.<br>
+&nbsp;&nbsp;&nbsp; <br>
+Define the path to install.bin.dir specified in step [1].<br>
+<br>
+<h3>[3] &lt;Only when using the SGE self scheduling version&gt; Build
+of sge_operatord</h3>
+NOTE: We have only tested for Linux 2.6.x on Intel x86 with SGE6.0u8,
+6.0u9, 6.1u2 and 6.1u3.<br>
+<br>
+Obtain the source code of SGE.<br>
+Decompress each of<br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://gridengine.sunsource.net/files/documents/7/78/sge-V60u8_TAG-src.tar.gz">http://gridengine.sunsource.net/files/documents/7/78/sge-V60u8_TAG-src.tar.gz</a><br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://gridengine.sunsource.net/files/documents/7/102/sge-V60u9_TAG-src.tar.gz">http://gridengine.sunsource.net/files/documents/7/102/sge-V60u9_TAG-src.tar.gz</a><br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://gridengine.sunsource.net/files/documents/7/149/sge-V61u2_TAG-src.tar.gz">http://gridengine.sunsource.net/files/documents/7/149/sge-V61u2_TAG-src.tar.gz</a><br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://gridengine.sunsource.net/files/documents/7/161/ge-V61u3_TAG-src.tar.gz">http://gridengine.sunsource.net/files/documents/7/161/ge-V61u3_TAG-src.tar.gz</a><br>
+and apply each of<br>
+&nbsp;&nbsp;&nbsp;
+PluS/src/jp/aist/gtrc/plus/scheduler/specific/sge/sched/operatord/sge-V60u8-plus.patch<br>
+&nbsp;&nbsp;&nbsp;
+PluS/src/jp/aist/gtrc/plus/scheduler/specific/sge/sched/operatord/sge-V60u9-plus.patch<br>
+&nbsp;&nbsp;&nbsp;
+PluS/src/jp/aist/gtrc/plus/scheduler/specific/sge/sched/operatord/sge-V61u3-plus.patch<br>
+such as
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">
+% tar zxf ge-V61u3_TAG-src.tar.gz<br>
+% cd gridengine<br>
+% patch -p1 < .../sge-V61u3-plus.patch<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+
+sge-V61u3-plus.patch can apply to both of SGE V61u2 and V61u3.<br>
+Build SGE normally (See gridengine/source/README.BUILD) 
+such as
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">
+% cd source<br>
+% ./aimk -only-depend<br>
+% scripts/zerodepend<br>
+% ./aimk depend<br>
+% ./aimk -only-core -no-secure<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+Copy gridengine/source/LINUX86_26/sge_operatord to
+$SGE_ROOT/bin/lx26-x86.<br>
+Commands such as sge_qmaster and qsub do not need to be replaced.
+(However, replacing them does not cause a problem if all of them complied successfully.)<br>
+<br>
+To know sge_operatord more, see <a href="#sge_operatord">here</a>.
+<br>
+<h3>[4] &lt;Only when using the TORQUE self scheduling version&gt;
+Build of pbs_iff </h3>
+Obtain TORQUE source (1.2.0 or later) from the following site.<br>
+&nbsp;&nbsp;&nbsp; <a
+ href="http://www.clusterresources.com/downloads/torque/">http://www.clusterresources.com/downloads/torque/</a><br>
+After decompressing, replace torque-X.Y.ZpN/src/iff/iff2.c with<br>
+&nbsp;&nbsp;&nbsp;
+src/jp/aist/gtrc/plus/scheduler/specific/pbs/pbs_iff/iff2.c_torque-X.Y.ZpN.<br>
+Build and set up TORQUE normally.<br>
+Define the path to pbs_iff (/usr/local/sbin as default).<br>
+&nbsp;&nbsp;&nbsp; <br>
+Patch iff2.c is available for TORQUE 1.2.0p4, 2.0.0p5, 2.1.0p0, and
+2.1.6.<br>
+Our modification is approximately 10 lines; therefore, it may be easy
+to add the same modification to other versions.<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="2._How_to_use_PluS"></a>2. How to use PluS</h1>
+<h2><a name="Startup_and_termination"></a>2.1 Startup and termination</h2>
+<h3>2.1.1 Startup conditions</h3>
+<ul>
+  <li>PluS must be started on the startup node of sge_qmaster (when
+using SGE)/pbs_server (when using TORQUE).</li>
+  <li>sge_qmaster/pbs_server must open the default port (do not specify
+    <span style="font-family: courier new,courier,monospace;">-p</span>).</li>
+  <li>For the SGE queue base version, sge_schedd must be started.</li>
+  <li>For the SGE/TORQUE self scheduler version, sge_schedd/pbs_sched
+must not be started.</li>
+  <li>A path to PluS script installation directory (/usr/local/bin as
+default) must be defined.</li>
+  <li>sge_qmaster/pbs_server must be started.</li>
+  <li>Another PluS must not have been started on the same node.</li>
+  <li>root privilege is not required to start the scheduler.<br>
+  </li>
+</ul>
+<h3>2.1.2 How to start scheduler</h3>
+Execute "<span style="font-family: courier new,courier,monospace;">plus_scheduler</span><span
+ style="font-family: courier new,courier,monospace;">
+[-t <span style="font-family: helvetica,arial,sans-serif;">target</span>]</span><span
+ style="font-family: courier new,courier,monospace;">
+[-a <span style="font-family: helvetica,arial,sans-serif;">algo</span>]</span><span
+ style="font-family: courier new,courier,monospace;">
+[-c <span style="font-family: helvetica,arial,sans-serif;">conffile</span>]</span><span
+ style="font-family: courier new,courier,monospace;">
+[-r <span style="font-family: helvetica,arial,sans-serif;">rsvFilePath</span>]</span><span
+ style="font-family: courier new,courier,monospace;">
+[-ne <span style="font-family: helvetica,arial,sans-serif;">maxExpired</span>]</span><span
+ style="font-family: courier new,courier,monospace;">
+[-sgeq <span style="font-family: helvetica,arial,sans-serif;">qNames</span>]</span>".
+<br>
+<ul>
+  <li>-t target: target cluster system name.<br>
+  <ul>
+    <li>"sge"
+    <ul>
+      <li>for SGE queue base version startup. This is default.<br>
+      </li>
+    </ul></li>
+    <li>"sgesched"
+    <ul>
+      <li>for SGE self scheduler version startup</li>
+    </ul></li>
+    <li>"pbs"
+    <ul>
+      <li>TORQUE self scheduler version startup</li>
+    </ul></li>
+  </ul>
+  </li>
+  <li>-a algo: Job scheduling algorithm
+  <ul>
+    <li>It works with SGE/TORQUE self scheduler version, not works with
+SGE queue base version.</li>
+    <li>You can specify "Sort" (default), or "Fifo".</li>
+    <li>Default sort order of jobs is same as TORQUE, check queue
+priority at first, job priority at second.</li>
+    <li>"Fifo" means jobs are sorted by their submission time.</li>
+    <li>You can change sort order by sched_conf file, which path is
+specified by -c option.</li>
+  </ul></li>
+  <li>-c conffile: PluS config file for job scheduling
+  <ul>
+    <li>PluS config file for job scheduling, not related to reservation
+management.</li>
+    <li>Currently this file defines sort order of jobs to execute and
+nodes to be used.</li>
+    <li>See "<a href="#Job_scheduling_algorithm">Job scheduling
+algorithm</a>" for sample conffile.<br>
+    </li>
+  </ul></li>
+  <li>-r rsvFilePath: Directory to make reserve DB file etc.<br>
+  <ul>
+    <li>The directory where the reservation DB file is stored.</li>
+    <li>Specify a directory with read/write permissions.</li>
+    <li>/usr/local/PluS or ${install.jar.dir} specified at build.xml is
+default.</li>
+  </ul>
+  </li>
+  <li>-ne maxExpired: Number of reservations to be remained after they
+expired
+  <ul>
+    <li>PluS deletes expired reservations from DB file, but remains
+maxExpired latest expired reservations.</li>
+    <li>Default value is 10.</li>
+    <li>Specify 0 not to remain expired reservations, -1 to remain all
+expired reservations forever.</li>
+  </ul></li>
+  <li><a name="plus_scheduler_sgeq"></a>-sgeq qNames:&nbsp; default SGE
+queue names to restrict reserve nodes [Only
+usable for SGE queue base version].
+  <ul>
+    <li>If you want to restrict reserve nodes only within nodes which
+have queue instances of the queues, specify queue names.</li>
+    <li>For example, default reservable nodes are host1 and host2 only,
+if<br>
+    <ul>
+      <li>Start PluS by "plus_scheduler .... -sgeq A.q", and<br>
+      </li>
+      <li>A.q's hostlist is { host1, host2 } (i.e. A.q@host1 and
+A.q@host2 exist), and<br>
+      </li>
+      <li>Make a reservation by <a href="#plus_reserve_sgeq">plus_reserve
+without -sgeq option</a>.</li>
+    </ul>
+    </li>
+    <li>If you want to specify multiple queues, specify such as "-sgeq
+A.q,B.q,C.q".<br>
+    </li>
+    <li>All execution nodes are reservable if this option is not
+specified.</li>
+    <li>Cannot reserve any nodes if specified queue doesn't exist or
+hostlist of the queue is empty.<br>
+    </li>
+  </ul></li>
+</ul>
+<h3>2.1.3 How to terminate scheduler</h3>
+Execute "<span style="font-family: courier new,courier,monospace;">plus_schedkill</span>"(Tentative:
+Anyone can execute this command
+and terminate the scheduler, and it may cause a problem.)<br>
+Or, kill the Java process of PluS.<br>
+<h2><a name="Reservation_management_command_note"></a>2.2 Reservation
+management
+command note<br>
+</h2>
+<h3>2.2.1 Usage conditions</h3>
+<ul>
+  <li>Use commands on Plus scheduler running host. Operation requests
+from other hosts are not allowed.<br>
+  </li>
+  <li>Each command has the -h option to display the simplified help.</li>
+</ul>
+<h3>2.2.2 Exit code and display</h3>
+<ul>
+  <li>When normal end (including help display)
+  <ul>
+    <li>Program exit code is "0".</li>
+    <li>Messages are displayed on the standard output.</li>
+  </ul></li>
+  <li>When abnormal end
+  <ul>
+    <li>Program exit code is "1".</li>
+    <li>Error messages are displayed on the standard error output.</li>
+  </ul></li>
+</ul>
+<h2><a name="Reservation_management_command"></a>2.3 Reservation
+management
+command</h2>
+<h3><a name="2.3.1_Registering_reservations"></a>2.3.1 Registering
+reservations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_reserve
+[-T] -s <span style="font-family: helvetica,arial,sans-serif;">startTime
+</span>[-e <span style="font-family: helvetica,arial,sans-serif;">endTime
+</span>| </span><span
+ style="font-family: courier new,courier,monospace;">-D <span
+ style="font-family: helvetica,arial,sans-serif;">duration] </span></span><span
+ style="font-family: courier new,courier,monospace;">-n
+<span style="font-family: helvetica,arial,sans-serif;">numNodes</span></span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"> </span>[-U <span
+ style="font-family: helvetica,arial,sans-serif;">users</span>]</span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"> </span></span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span>[-mem <span
+ style="font-family: helvetica,arial,sans-serif;">memSize</span>]</span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span>[-ncpu <span
+ style="font-family: helvetica,arial,sans-serif;">cpuNum</span>]</span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span> </span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span>[-arch <span
+ style="font-family: helvetica,arial,sans-serif;">arch</span>]</span><span
+ style="font-family: courier new,courier,monospace;"> </span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span>[-os <span
+ style="font-family: helvetica,arial,sans-serif;">os</span>] </span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span>[-l <span
+ style="font-family: helvetica,arial,sans-serif;">attr=value[,...]</span>]</span><span
+ style="font-family: courier new,courier,monospace;"> [-p]</span><span
+ style="font-family: courier new,courier,monospace;"></span><span
+ style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;"></span> </span><span
+ style="font-family: courier new,courier,monospace;">[-sn <span
+ style="font-family: helvetica,arial,sans-serif;">slotNum</span>]</span><span
+ style="font-family: courier new,courier,monospace;"></span><span
+ style="font-family: courier new,courier,monospace;"> </span><span
+ style="font-family: courier new,courier,monospace;">[-sgeq <span
+ style="font-family: helvetica,arial,sans-serif;">qNames</span>]</span><span
+ style="font-family: courier new,courier,monospace;"></span><span
+ style="font-family: courier new,courier,monospace;"> </span><span
+ style="font-family: courier new,courier,monospace;">[-x]</span>
+<ul>
+  <li>-T: Act making reservation as 2-phase transaction.
+  <ul>
+    <li>You must use plus_commit/plus_abort after plus_reserve
+succeeded.<br>
+    </li>
+  </ul></li>
+  <li>-s startTime: starting time of reservation<br>
+  <ul>
+    <li>The following formats are supported for time specifications.
+    <ul>
+      <li>"yyyy-MM-DDTHH:mm:ss+zz:zz" or "...-zz:zz"</li>
+      <li>"yyyy-MM-DDTHH:mm:ss+zzzz"&nbsp; or "...-zzzz"</li>
+      <li>"yyyy-MM-DDTHH:mm:ssZ"</li>
+      <li>"yyyy-MM-DDTHH:mm:ss"</li>
+    </ul></li>
+    <li>The first and third formats are ISO8601 formats. The third
+format is UTC, and the fourth format interprets the time as the local
+host time where this command is executed.</li>
+    <li>The following notations are equivalent when describing January
+27, 2006, Japan time (GMT+09:00).
+    <ul>
+      <li>"2006-01-27T12:34:56+09:00"</li>
+      <li>"2006-01-27T12:34:56+0900"</li>
+      <li>"2006-01-27T03:34:56Z"</li>
+      <li>"2006-01-27T12:34:56"<br>
+        <br>
+      </li>
+    </ul></li>
+    <li>Time notation of the PBSPro format is also supported. Time
+notation of the PBSPro format is as follows:
+    <ul>
+      <li>"[CC[YY[MM[DD]]]]HHmm[.ss]"</li>
+    </ul></li>
+    <li>For example, the time mentioned above is described as:
+    <ul>
+      <li>"200601271234.56"</li>
+      <li>&nbsp;&nbsp;&nbsp; "0601271234.56"</li>
+      <li>&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; "01271234.56"</li>
+      <li>&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+"271234.56"</li>
+      <li>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+"1234.56"</li>
+    </ul></li>
+    <li>If today is 2006/01/27, all of the above are equivalent. <br>
+    </li>
+    <li>If there is no second notation, the second value is assumed as
+&#8220;00&#8221;.</li>
+    <li>When the date is not specified and the specified time is past,
+the time is assumed as the time of tomorrow. For example, when the
+current time is 15:00 and "1234.56" is specified, the specified time
+represents the time of tomorrow.</li>
+    <li>Time zone cannot be specified, and the time is always assumed
+as a local time.</li>
+    <li>Same as touch(1), the position of CCYY differs from date(1).</li>
+  </ul>
+  </li>
+  <li>-e endTime: ending time of reservation
+  <ul>
+    <li>Time format is same as startTime.</li>
+  </ul></li>
+  <li>-D duration: reservation duration
+  <ul>
+    <li>Supported time format is "[[HH:]mm:]ss".</li>
+    <li>Cannot specify endTime and duration at same time.</li>
+  </ul></li>
+  <li>-n numNodes: number of nodes to reserve
+  <ul>
+    <li>Specify number of nodes you want to reserve such as 16 etc.
+    </li>
+    <li>Node resource specifications (number of CPUs, memory, etc.) are
+not supported with commands (tentative limitation).</li>
+  </ul></li>
+  <li>-U users: user names who can use this reservation
+  <ul>
+    <li>Specify user names, such as "-U userA" or "-U
+userA,userB,userC" etc.</li>
+    <li>Submitted jobs by these users to this reservation will be
+executed, others are not.<br>
+    </li>
+    <li>If this option is not specified, a reservation owner (user who
+executes this command)&nbsp; can only use this resevation.<br>
+      <br>
+    </li>
+  </ul></li>
+  <li>-mem memSize: requested memory size on reserve node
+  <ul>
+    <li>Specify physical memory size of reserved node, such as "100M",
+"0.5G" etc.</li>
+    <li>Nodes which have larger or equal memory will be reserved.<br>
+    </li>
+    <li>Postfix "k", "m", "g", "t" mean 10^3, 10^6, 10^9, 10^12. "K",
+"M", "G", "T" mean 2^10, 2^20, 2^30, 2^40.</li>
+    <li>Without postfix value means byte.<br>
+    </li>
+  </ul></li>
+  <li>-ncpu cpuNum: requested CPU (core) number on reserve node
+  <ul>
+    <li>Specify CPU (core) number, such as 2 (means dual CPU) etc.</li>
+    <li>Nodes which have more or equal CPU (core) will be reserved.</li>
+    <li>Using PluS for SGE, number of CPU is same as "NCPU" value got
+by <span style="font-family: courier new,courier,monospace;">qhost</span>
+command.<br>
+    </li>
+    <li>Using PluS for TORQUE, number of CPU is same as "ncpus" value
+in status information got by <span
+ style="font-family: courier new,courier,monospace;">pbsnodes</span>
+command.<br>
+If "ncpus" number isn't available, use "np" value as CPU number which
+is set by $TORQUE/server_priv/nodes file.<br>
+    </li>
+    <li>Cannot distinguish between dual core (such as
+Hyper-threading)&nbsp; and real dual CPU.</li>
+  </ul></li>
+  <li>-arch arch: requested CPU architecture of reserve node
+  <ul>
+    <li>Specify CPU architecture within "x86", "ia64", "x86_64",
+"sparc", "sparc64", "alpha", "ppc", "unknown".</li>
+    <li>Nodes which have specified CPU architecture will be reserved.</li>
+    <li>If you specify "x86_64", only "x86_64" nodes will be reserved,
+"x86" nodes are not selected.&nbsp; Same as "sparc64", "sparc"
+selection.</li>
+    <li>All nodes are selectable if "unknown" specified or this option
+isn't specified.<br>
+    </li>
+  </ul></li>
+  <li>-os os: requested OS of reserve node
+  <ul>
+    <li>Specify OS within "Linux", "Linux_22", "Linux_24", "Linux_26",
+"Solaris", "Solaris_8", "Solaris_9", "Solaris_10", "Windows",
+"Windows_2000", "Windows_XP", "Unknown".</li>
+    <li>Nodes which have specified OS will be reserved.</li>
+    <li>If you specify "Linux", all version of Linux nodes are
+selectable. Same as "Solaris", "Windows" selection.</li>
+    <li>If you specify "Linux_26", only Linux 2.6.x nodes are
+selectable. Same as others.</li>
+    <li>All nodes are selectable if "Unknown" specified or this options
+isn't specified.</li>
+  </ul></li>
+  <li>-l attr=value: requested resources of reserve node<br>
+  <ul>
+    <li>Specify requested resource name and it's value on reserve node.</li>
+    <li>Notation is depend on cluster system (SGE, TORQUE) .<br>
+    </li>
+    <li>Using PluS on SGE (queue base version and self scheduling
+version), you can specify attribute same as <span
+ style="font-family: courier new,courier,monospace;">qsub -l.</span>
+    <ul>
+      <li>ex: "plus_reserve .... -l arch=lx*,num_proc=2,mf=1G" will
+select Linux nodes which has 2 CPU and &gt;=1GB free memory.</li>
+      <li>You can use normal attribute name (such as "arch", "mem_free"
+etc) and shortcut name (such as "a", "mf" etc).<br>
+      </li>
+      <li>Relation operation of requested value and each node value are
+specified by <span style="font-family: courier new,courier,monospace;">qconf
+-mc</span>.</li>
+      <li>Nodes which are satisfied <span
+ style="text-decoration: underline;">all</span> of attr=value
+specifications will be reserved.<br>
+      </li>
+      <li>All of "requestable=YES" attributes defined by <span
+ style="font-family: courier new,courier,monospace;">qconf -mc</span>
+are usable.</li>
+    </ul></li>
+    <li>Using PluS on TORQUE, you can specify node properties which
+defined in $TORQUE/server_priv/nodes
+    <ul>
+      <li>ex: "plus_reserve ... -l propA" will select nodes which have
+"propA" property.</li>
+      <li>Currently, PluS doesn't support more complex format such as
+"-l nodes=2:blue:ppn=2+red:ppn=3+b1014".<br>
+Please use -n nodeNum and -ncpu/-mem/-os/-arch options.</li>
+    </ul></li>
+  </ul>
+  </li>
+  <li>-p: Make pre/post queue [Only usable for SGE queue base version].
+  <ul>
+    <li>Assume reserve id is R123. Normally (without -p option), PluS
+always makes R123 queue only.<br>
+But -p is specified, PluS makes R123pre and R123post queues also.</li>
+    <li>After reserve startTime, jobs in these queues will start in
+order of R123pre, R123, and finally R123post.<br>
+You may submit preparation jobs to R123pre, main jobs to R123,
+disposition jobs to R123post.</li>
+    <li>PluS guarantees that jobs in R123 will start after all of jobs
+in R123pre has finished.</li>
+    <li>Jobs in R123post will start after reserve endTime.<br>
+      <br>
+    </li>
+  </ul></li>
+  <li>-sn slotNum: Slot number of each reserve queue instance. [Only
+usable for SGE queue base version].
+  <ul>
+    <li>Normally (without -sn option), PluS makes each queue instance
+which available slot number is number of CPU (core) of node.<br>
+You can override default slot number such as 1 or more.</li>
+  </ul></li>
+  <li><a name="plus_reserve_sgeq"></a>-sgeq qNames: SGE queue names to
+restrict reserve nodes [Only
+usable for SGE queue base version].
+  <ul>
+    <li>If "-sgeq qNames" is specified, PluS tries to allocate
+reserve nodes within hostlist of the qNames only.</li>
+    <li>If you want to specify multiple queues, specify such as "-sgeq
+A.q,B.q,C.q".</li>
+    <li>If not specified, default qNames which specified at <a
+ href="#plus_scheduler_sgeq">"-sgeq qNames" of plus_scheduler</a> are
+refereed.</li>
+    <li>If -sgeq is not specified at both plus_reserve and
+plus_scheduler, all execution nodes are reservable.
+    </li>
+  </ul></li>
+</ul>
+<br>
+<ul>
+  <li>When a reservation is successfully made, the following message is
+displayed.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "Reserve succeeded: reserve id is R123"<br>
+"R123" at the end is the reservation ID.</li>
+  <li>When using the -x option, "R123" (without line feed) is displayed.<br>
+  </li>
+</ul>
+<h3><a name="2.3.2_Viewing_reservation_information"></a>2.3.2 Viewing
+reservation information</h3>
+<span style="font-family: courier new,courier,monospace;">plus_status
+[-r <span style="font-family: helvetica,arial,sans-serif;">rsvID</span>]
+[-o <span style="font-family: helvetica,arial,sans-serif;">owner</span>]</span><span
+ style="font-family: courier new,courier,monospace;"> [-n]</span><span
+ style="font-family: courier new,courier,monospace;">
+</span><span style="font-family: courier new,courier,monospace;">[-s <span
+ style="font-family: helvetica,arial,sans-serif;">startTime</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-e <span
+ style="font-family: helvetica,arial,sans-serif;">endTime</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-ne <span
+ style="font-family: helvetica,arial,sans-serif;">numShowExpired</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-x]</span><br>
+<ul>
+  <li>-r rsvId: Reservation ID of you want to show.</li>
+  <li>-o owner: Reservation owner of you want to show.</li>
+  <li>-s startTime: Show reservations which end after startTime.
+  <ul>
+    <li>Notation of startTime is same as plus_reserve -s startTime
+option.</li>
+  </ul></li>
+  <li>-e endTime: Show reservation which start before endTime.
+  <ul>
+    <li>Notation of endTime is same as startTime option.</li>
+  </ul></li>
+  <li>-ne numShowExpired: Maximun number of shown reserves is
+numShowExpired.<br>
+  <ul>
+    <li>If not specified, expired reservations are not shown.</li>
+    <li>PluS remains number of maxExpired expired reserves which is
+specified at plus_scheduler -ne option.<br>
+    </li>
+  </ul>
+  </li>
+</ul>
+<ul>
+  <li>When using the -n option, the information is displayed at every
+reserved nodes.<br>
+  </li>
+  <li>When using the -x option, the information is displayed in XML
+format.
+  <ul>
+    <li>Format to display all reservation information:<br>
+&nbsp;&nbsp;&nbsp; &lt;reservationList&gt;<br>
+&nbsp;&nbsp; &nbsp;&lt;reservation&gt;....&lt;/reservation&gt;<br>
+&nbsp;&nbsp; &nbsp;...<br>
+&nbsp;&nbsp; &nbsp;&lt;/reservationList&gt;<br>
+    </li>
+    <li>Format to display single reservation information:<br>
+&nbsp;&nbsp;&nbsp; &lt;reservation&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;id&gt;R123&lt;/id&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;owner&gt;userA&lt;/owner&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;users&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;user&gt;userA&lt;/user&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/users&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;start&gt;2006-01-25T18:00:00+09:00&lt;/start&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;end&gt;2006-01-25T19:00:00+09:00&lt;/end&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;state&gt;Running&lt;/state&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;nomNodes&gt;1&lt;/numNodes&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;nodes&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;node&gt;hostA.example.com&lt;/node&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/nodes&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/reservation&gt;</li>
+    <li>For time notation in XML is the ISO8601 format.<br>
+    </li>
+  </ul></li>
+</ul>
+<h3><a name="2.3.3_Canceling_reservations"></a>2.3.3 Canceling
+reservations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_cancel
+[-T</span><span style="font-family: courier new,courier,monospace;">] [</span><span
+ style="font-family: courier new,courier,monospace;">-r <span
+ style="font-family: helvetica,arial,sans-serif;">rsvID</span></span><span
+ style="font-family: courier new,courier,monospace;">] [</span><span
+ style="font-family: courier new,courier,monospace;">-o <span
+ style="font-family: helvetica,arial,sans-serif;">owner</span>]</span><br>
+<ul>
+  <li>-T: Act cancel as 2-phase transaction.
+  <ul>
+    <li>You must use <a href="#2.3.7_Confirming_reservation_operations">plus_commit</a>/<a
+ href="#2.3.8_Discarding_reservation_operations">plus_abort</a> after
+plus_cancel succeeded.<br>
+    </li>
+  </ul></li>
+  <li>-r rsvID: Reservation Id to cancel.
+  <ul>
+    <li>Canceled reservation remains until it's expired.</li>
+    <li>Use <a href="#2.3.6_Discarding_reservations">plus_destroy</a>
+if you want to delete reservation completely just now.</li>
+  </ul></li>
+  <li>-o owner: Owner of reservation of you want to cancel.
+  <ul>
+    <li>All reservations owned by owner is canceled.</li>
+    <li>You cannot specify -r and -o or -R and -o at same time.<br>
+      <br>
+    </li>
+  </ul></li>
+  <li>Only reservations made by the command executer can be canceled.<br>
+  </li>
+  <li>If a job reservation is canceled while the job is being executed,
+the job stops and is returned to a queue; however, the job will not be
+executed again.<br>
+  </li>
+</ul>
+<h3><a name="2.3.4_Changing_reservations"></a>2.3.4 Changing
+reservations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_modify
+</span><span style="font-family: courier new,courier,monospace;">[</span><span
+ style="font-family: courier new,courier,monospace;">-T] -r <span
+ style="font-family: helvetica,arial,sans-serif;">rsvID </span>[-s
+<span style="font-family: helvetica,arial,sans-serif;">startTime</span>]
+[-e <span style="font-family: helvetica,arial,sans-serif;">endTime</span>
+| </span><span style="font-family: courier new,courier,monospace;">-D <span
+ style="font-family: helvetica,arial,sans-serif;">duration</span></span><span
+ style="font-family: courier new,courier,monospace;">]
+[-n <span style="font-family: helvetica,arial,sans-serif;">numNodes</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-U <span
+ style="font-family: helvetica,arial,sans-serif;">users</span>]</span>
+<ul>
+  <li>Change the startTime/endTime/duration/numNodes/users for the
+specified reservation.</li>
+  <li>Unspecified parameters will not be changed.</li>
+  <li>If the change is not completed successfully (unable to reserve a
+new node), the status of the reservation will not be changed.</li>
+  <li>The argument notation format is the same as <a
+ href="#2.3.1_Registering_reservations">plus_reserve</a>.</li>
+  <li>When using the -T option, invoke plus_commit/plus_abort to
+confirm/abort the operation after invoking this command.</li>
+</ul>
+<h3><a name="2.3.5_Confirming_the_number_of_nodes"></a>2.3.5 Confirming
+the number of nodes available for reservations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_availnodes
+-s <span style="font-family: helvetica,arial,sans-serif;">startTime </span>-e
+<span style="font-family: helvetica,arial,sans-serif;">endTime </span>[-x]</span><br>
+<ul>
+  <li>Display the number of nodes where no reservations across the
+period exist.</li>
+  <li>Specify the starting time and ending time in the same format as <a
+ href="#2.3.1_Registering_reservations">plus_reserve</a>.</li>
+  <li>When the confirmation of the number of nodes is completed
+successfully, the following message is displayed.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "Available node number is
+10"</li>
+  <li>When specifying the -x option, "10" (without line feed) is
+displayed.<br>
+  </li>
+</ul>
+<h3><a name="2.3.6_Discarding_reservations"></a>2.3.6 Discarding
+reservations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_destroy
+[-T] [-r <span style="font-family: helvetica,arial,sans-serif;">rsvID</span>]
+[-o <span style="font-family: helvetica,arial,sans-serif;">owner</span>]</span><br>
+<ul>
+  <li>Discard the reservation of the specified reservation ID, or all
+reservations made by the specified reservation owner.</li>
+  <li>A reservation to be discarded will be immediately deleted without
+waiting for the reservation ending time.</li>
+  <li>Only reservations made by the command executer can be discarded.</li>
+  <li>When using the -T option, invoke plus_commit/plus_abort to
+confirm/abort the operation after invoking this command.</li>
+  <li>However, options -T and -o cannot be specified simultaneously.
+When specifying the -o option, the operation is implicitly confirmed,
+and cannot be aborted.<br>
+  </li>
+</ul>
+<h3><a name="2.3.7_Confirming_reservation_operations"></a>2.3.7
+Confirming reservation operations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_commit
+-r </span><span style="font-family: courier new,courier,monospace;"><span
+ style="font-family: helvetica,arial,sans-serif;">reservationID</span></span><span
+ style="font-family: courier new,courier,monospace;"> </span>
+<ul>
+  <li>After invoking plus_reserve/modify/cancel/destroy with the -T
+option, confirm the operation when the operation has been completed
+successfully.<br>
+  </li>
+</ul>
+<h3><a name="2.3.8_Discarding_reservation_operations"></a>2.3.8
+Discarding reservation operations</h3>
+<span style="font-family: courier new,courier,monospace;">plus_abort
+-r <span style="font-family: helvetica,arial,sans-serif;">reservationID</span></span><br>
+<ul>
+  <li>After invoking plus_reserve/modify/cancel/destroy with the -T
+option, discard the changes in the reservation operation when the
+operation has been completed successfully.</li>
+  <li>If the operation failed, there is no need to execute plus_abort.</li>
+  <li>When plus_abort is executed, the status will return to the same
+status as before executing plus_xxx -T.</li>
+</ul>
+<h3><a name="2.3.9_Viewing_account_of_reservation"></a>2.3.9 Viewing
+account of reservation usage</h3>
+<span style="font-family: courier new,courier,monospace;">plus_account&nbsp;</span><span
+ style="font-family: courier new,courier,monospace;"></span><span
+ style="font-family: courier new,courier,monospace;">[-s <span
+ style="font-family: helvetica,arial,sans-serif;">startTime</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-e <span
+ style="font-family: helvetica,arial,sans-serif;">endTime</span>]
+</span><span style="font-family: courier new,courier,monospace;">[-d <span
+ style="font-family: helvetica,arial,sans-serif;">days</span>] </span><span
+ style="font-family: courier new,courier,monospace;">
+</span><span style="font-family: courier new,courier,monospace;">[-f <span
+ style="font-family: helvetica,arial,sans-serif;">logfile</span>]</span><span
+ style="font-family: courier new,courier,monospace;"></span><span
+ style="font-family: courier new,courier,monospace;"> [-o <span
+ style="font-family: helvetica,arial,sans-serif;">[owner]</span>]
+</span><span style="font-family: courier new,courier,monospace;"> </span><span
+ style="font-family: courier new,courier,monospace;">[-n <span
+ style="font-family: helvetica,arial,sans-serif;">[nodes</span>]]</span><span
+ style="font-family: courier new,courier,monospace;"> </span><span
+ style="font-family: courier new,courier,monospace;">
+</span><span style="font-family: courier new,courier,monospace;">[-l<span
+ style="font-family: helvetica,arial,sans-serif;"></span>] </span><span
+ style="font-family: courier new,courier,monospace;">
+</span><span style="font-family: courier new,courier,monospace;">[-S<span
+ style="font-family: helvetica,arial,sans-serif;"></span>]</span><br>
+<ul>
+  <li>-s startTime: start time/date of viewing account information
+  <ul>
+    <li>time notation is same as plus_reserve.</li>
+    <li>"[yyyy-]MM-DD" notation is also supported.&nbsp; It means
+"yyyy-MM-DD'T'00:00:00".<br>
+    </li>
+  </ul></li>
+  <li>-e endTime: end time/date of viewing account information
+  <ul>
+    <li>time/date notation is same as startTime.<br>
+    </li>
+  </ul></li>
+  <li>-d days: viewing duration in day
+  <ul>
+    <li>show information of past days, allows decimal such as "3.5".</li>
+  </ul></li>
+  <li>-f logfile: reservation logging file (reserves.log) directory<br>
+    <br>
+  </li>
+  <li>-o [owner]: show reservations of specified owner only.<br>
+  <ul>
+    <li>-o: show all reservations at every reservation owners</li>
+  </ul>
+  </li>
+  <li>-n [nodes]: show reservations of specified nodes are reserved
+only.
+  <ul>
+    <li>Specify node name as "-n nodeA", "-n nodeA,nodeB,nodeC" etc.</li>
+    <li>-n: show all reservations at every reserved nodes<br>
+    </li>
+  </ul></li>
+  <li>-l: show all reservations at every reservation.</li>
+  <li>-S: show all reservations at every reservation start date
+("yyyy-MM-DD" format)<br>
+  </li>
+</ul>
+<ul>
+  <li>viewing duration is defined as follows:<br>
+  </li>
+</ul>
+  <table style="text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+    <tbody>
+      <tr>
+        <td style="vertical-align: top;">startTime<br>
+        </td>
+        <td style="vertical-align: top;">endTime<br>
+        </td>
+        <td style="vertical-align: top;">days<br>
+        </td>
+        <td style="vertical-align: top;">viewing duration<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">all reservations<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">D<br>
+        </td>
+        <td style="vertical-align: top;">in [now - D days, now]<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">E<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">all reservations ended
+before E<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">E<br>
+        </td>
+        <td style="vertical-align: top;">D<br>
+        </td>
+        <td style="vertical-align: top;">in [E - D days, E]<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">S<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">all reservations started
+after S<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">S<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">D<br>
+        </td>
+        <td style="vertical-align: top;">in [S, S + D days]<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">S<br>
+        </td>
+        <td style="vertical-align: top;">E<br>
+        </td>
+        <td style="vertical-align: top;">none<br>
+        </td>
+        <td style="vertical-align: top;">in [S, E]<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">S<br>
+        </td>
+        <td style="vertical-align: top;">E<br>
+        </td>
+        <td style="vertical-align: top;">D<br>
+        </td>
+        <td style="vertical-align: top;">Error: endTime and days
+cannot specify at same time<br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<h2><a name="Restrictions_on_reservation_transactions"></a>2.4
+Restrictions
+on reservation transactions</h2>
+plus_reserve/cancel/modify/destroy has the -T option.<br>
+When executing these plus_xxx with the -T option:<br>
+<ul>
+  <li>When the operation is completed successfully, you must confirm
+the
+operation using plus_commit, or abort the operation using plus_abort.</li>
+  <li>When the operation is waiting for commit/abort, a new operation
+of plus_reserve/cancel/modify/destroy cannot be executed. Only
+plus_commit/abort or plus_status/availnodes/schedkill is acceptable.</li>
+  <li>If the operation failed, no need to execute plus_abort.<br>
+  </li>
+</ul>
+When executing plus_xxx without the -T option:<br>
+<ul>
+  <li>plus_commit/abort is not required regardless of whether the
+operation succeeded or failed.</li>
+</ul>
+<br>
+When the operation is waiting for commit/abort, plus_scheduler is valid
+before and after a restart.<br>
+When specifying the -o owner option for plus_cancel/destroy, the -T
+option cannot be used.<br>
+<br>
+The operation is automatically aborted at follow conditions:<br>
+<ul>
+  <li>waiting plus_commit/plus_abort more than 180 sec</li>
+  <li>Operation started before reservation startTime, and already
+passed startTime</li>
+  <li>Operation started before reservation endTime, and already passed
+endTime</li>
+</ul>
+<br>
+<h2><a name="Submitting_jobs_to_reservations"></a>2.5 Submitting jobs
+to
+reservations</h2>
+Assume that a reservation with ID = R123 has been reserved by
+processing the reservation registration mentioned above.<br>
+<ul>
+  <li>How to use reservations with the SGE queue base version
+  <ul>
+    <li>Since a queue with the name of R123 has been created, submit a
+job to the queue using <br>
+      <span style="font-family: courier new,courier,monospace;">qsub
+-q R123 ...</span>, etc.</li>
+  </ul></li>
+  <li>How to use reservations with the SGE self scheduling version
+  <ul>
+    <li>submit a job using <span
+ style="font-family: courier new,courier,monospace;">qsub -ac
+rsvid=R123 ...</span>, etc.</li>
+  </ul></li>
+  <li>How to use reservations with the PBS self scheduling version
+  <ul>
+    <li>submit a job using <span
+ style="font-family: courier new,courier,monospace;">qsub -W
+x=rsvid:R123 ...</span>, etc.</li>
+  </ul></li>
+</ul>
+If the reservationID is incorrect or you want to cancel the reservation
+execution, delete the job by executing qdel jobID.<br>
+<br>
+<h2><a name="Reservation_and_job_execution"></a>2.6 Reservation and job
+execution</h2>
+A job not specified with a reservation ID when it was input will be
+executed immediately if there is an execution node that is not reserved
+or running other jobs.<br>
+TORQUE schedules immediately after the job was input; however, SGE
+schedules with a certain interval.<br>
+<br>
+A job specified with a reservation ID will be executed at the time of
+its reservation starting time.<br>
+However, there may be an interval of 30 seconds (at maximum) between
+the reservation starting time and the actual execution starting time
+since the job execution is scheduled every 30 seconds (at maximum).<br>
+<br>
+A reservation may not be executed even when the reservation has been
+successfully registered if the execution node is down at the execution
+time or numerous jobs were input in the reservation.<br>
+In this case, the reservation node will not be switched (tentative
+specifications).<br>
+<br>
+If a job had been input without reservation and is running on a node at
+the time when the node is reserved for another job, the job will be
+forcibly stopped and sent back to the queue (back to the state after
+the job was input.)<br>
+The job will be executed from the beginning again if a node, which is
+not reserved or running any jobs, is found by the subsequent scheduling.<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="3._Internal_description"></a>3. Internal description</h1>
+<h2><a name="Operation_descriptions_of_SGE_queue_base"></a>3.1
+Operation
+descriptions of SGE queue base version</h2>
+PluS of the SGE queue base version creates a corresponding queue for
+SGE when a reservation is created.<br>
+Reservation users can utilize the reservations by inputting jobs in the
+reservation queue.<br>
+For exclusive usage of reservation, users who can use the reservations
+and execution hosts available for the reservations are specified for
+the reservation queue.<br>
+<br>
+PluS executes suspend for the reservation queue before the reservation
+starting time, resumes it at the reservation starting time, and deletes
+the queue as a whole at the reservation ending time. If a job is input
+to a reservation queue which is suspended, the job is not executed. The
+reserved job will be executed by the first scheduling after the
+reservation is resumed.<br>
+The job scheduling of the SGE queue base version is controlled by the
+original sge_schedd, and PluS itself does not execute the job
+scheduling.<br>
+The queue control of PluS is controlled by executing its own shell
+script from PluS.<br>
+<br>
+<h3>3.1.1 Operations when creating a reservation</h3>
+<ol>
+  <li>Decide a reservation node based on the node information PluS
+collects. Issue a reservation ID (R123 in this example), and record the
+reservation information in a DB file.<br>
+These operations are the same as the self scheduling version.</li>
+  <li>Create an SGE host group, @R123_hosts, corresponding to the
+reservation node group.</li>
+  <li>Create an SGE user group, R123_users, corresponding to the
+reservation users.</li>
+  <li>Create a reservation queue R123. At this point, set the available
+host to @R123_hosts, and the available user to R123_users.</li>
+  <li>Suspend R123.</li>
+</ol>
+Use sge_rsvq_reg_nodes.sh for step 2, and use sge_rsvq_new.sh for steps
+3 to 5.<br>
+<br>
+<h3>3.1.2 Normal operations</h3>
+PluS checks the reservation table regularly (30 second intervals as
+default) to detect a reservation whose starting or ending time has
+already passed.<br>
+Conduct the procedures of &#8220;Operations when starting a reservation&#8221; if
+there is a suspended queue during its reservation period, and conduct
+the procedures of &#8220;Operations when ending a reservation&#8221; if there is a
+reservation queue after its reservation ending time.<br>
+<br>
+<h3>3.1.3 Operations when starting a reservation</h3>
+<ol>
+  <li>Suspend normal queues (original queues except reservation queues
+PluS created) on the reservation node.</li>
+  <li>Forcibly terminate jobs without reservations on the reservation
+node, and return the jobs to a queue.</li>
+  <li>Resume the reservation queue.</li>
+</ol>
+Use sge_rsvq_start_rsv.sh for steps 1 to 3.<br>
+Use the following script for step 2.<br>
+&nbsp;&nbsp;&nbsp; qmod -sj jobID<br>
+&nbsp;&nbsp;&nbsp; sudo -u jobOwnerName qresub jobID<br>
+&nbsp;&nbsp;&nbsp; qdel jobID<br>
+To change how to handle jobs without reservations at the reservation
+starting time, modify this script.<br>
+<br>
+Note that the job owner will be the qresub executer, in other words the
+PluS scheduler executer, when the job is re-input using qresub. To
+avoid this problem, sudo is used. This is the reason why sudoers
+settings are required at setup.<br>
+<br>
+<h3>3.1.4 Operations when ending a reservation</h3>
+<ol>
+  <li>Delete all jobs (regardless of whether it is running or waiting
+for the operation) on the reservation queue.</li>
+  <li>Delete the reservation queue, the user group and host group
+created for the queue.</li>
+</ol>
+Use sge_rsvq_del.sh for steps 1 and 2.<br>
+Since running jobs are also deleted, use the following script with the
+-f option for step 1.<br>
+&nbsp;&nbsp;&nbsp; qdel -f jobID<br>
+To change how to handle jobs at the reservation ending time, modify
+this script.<br>
+<br>
+<h3>3.1.5 Operations when canceling a reservation</h3>
+<ol>
+  <li>Change the host available for the reservation queue from
+@R123_hosts to NONE.<br>
+As specifications of PluS, canceling a reservation only releases the
+reservation node, and the reservation information remains. Therefore,
+the reservation queue remains.</li>
+</ol>
+Use sge_rsvq_unreg_nodes.sh for step 1.<br>
+<br>
+<h2><a name="Job_scheduling_algorithm"></a>3.2 Job scheduling algorithm</h2>
+The SGE self scheduling version and TORQUE self scheduling version do
+not use the original scheduler (sge_schedd/pbs_sched), and PluS itself
+controls scheduling.<br>
+As default, PluS executes jobs in order of priority, and in order of
+FIFO (order of job input time) if jobs have the same priority.<br>
+<br>
+To specify the job execution order or node allocation order, create the
+following setting file (save as sched_conf), and execute plus_scheduler
+-a Sort -c sched_conf at scheduler startup.<br>
+<br>
+Example of sched_conf description<br>
+<table
+ style="text-align: left; width: 80%; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;"># Scheduler Config
+file SAMPLE</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#
+NodeSortKey can specify</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+NodeName, LowestLoadAverage, LongestIdleTime,
+LargestPhysicalMemory</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#
+JobSortKey can specify</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+JobPriority, </span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+LeastCPURequested, MostCPURequested,</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+LeastNodeRequested, MostNodeRequested,</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+LeastTimeRequested, MostTimeRequested,</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+QueuePriority, QueueRoundRobin, ByQueue,</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#&nbsp;&nbsp;&nbsp;
+OwnersName, OwnersGroup, OwnersHost</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#
+OwnersXxx needs to specify XxxsOrder.</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#
+SortKey: 1st sort key, 2nd sort key, ...</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">NodeSortKey:&nbsp;&nbsp;&nbsp;
+LowestLoadAverage, LongestIdleTime</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">JobSortKey:&nbsp;&nbsp;&nbsp;&nbsp;
+QueuePriority, JobPriority</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">#
+OrderType: primary job owner(group/host/domain), 2nd, ...</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">OwnersOrder:&nbsp;&nbsp;&nbsp;
+studentA,studentB</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">GroupsOrder:&nbsp;&nbsp;&nbsp;
+professors, doctors, masters</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">HostsOrder:&nbsp;&nbsp;&nbsp;&nbsp;
+apgrid.org, hpcc.org</span><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+In this example:<br>
+<ul>
+  <li>An execution node with low load has priority. If there are
+multiple nodes with the same load, a node with a longer idling time has
+priority.</li>
+  <li>An execution job with a higher queue priority has priority. If
+there are multiple jobs with the same queue priority, a job with a
+higher job priority has priority.</li>
+  <li>When giving priority to the job submit person, specify who has
+priority using OwnersOrder, GroupsOrder, and HostsOrder.<br>
+  </li>
+</ul>
+Job priority is the value X (Max. 1023, standard 0) specified by qsub
+-p X.<br>
+<br>
+<h2><a name="Torque_scheduler_settings_and"></a>3.3 Torque scheduler
+settings and corresponding PluS settings</h2>
+The following job sort methods are available to Torque Fifo scheduler
+setting file (/var/spool/torque/sched_priv/sched_conf).<br>
+<br>
+round_robin:<br>
+&nbsp;&nbsp;&nbsp; When multiple queues exist, a job in the first queue
+is executed first, and a job in the second queue is executed at the
+second scheduling even if a job waiting to be executed exists in the
+first queue.<br>
+&nbsp;&nbsp;&nbsp; Default is false.<br>
+<br>
+by_queue:<br>
+&nbsp;&nbsp;&nbsp; When multiple queues exist, a job in the first queue
+is executed first, and if a job waiting to be executed exists in the
+first queue at the second scheduling, the job is executed. If a job
+waiting to be executed does not exist in the first queue, a job in the
+second queue is executed.<br>
+&nbsp;&nbsp;&nbsp; Default is true.<br>
+<br>
+sort_queues:<br>
+&nbsp;&nbsp;&nbsp; Queue selection order (with or without
+specifications of round_robin and by_queue) is the queue priority order.<br>
+&nbsp;&nbsp;&nbsp; If the queue priority order does not exist, use the
+order registered in pbs_server.<br>
+&nbsp;&nbsp;&nbsp; Default is true.<br>
+<br>
+strict_fifo:<br>
+&nbsp;&nbsp;&nbsp; When multiple jobs waiting to be executed exist in a
+queue, the first input job is executed first.<br>
+&nbsp;&nbsp;&nbsp; If this is not specified, execute in the order of
+job priority.<br>
+&nbsp;&nbsp;&nbsp; Default is true.<br>
+&nbsp;&nbsp;&nbsp; With Torque implementation, however, jobs are not
+executed in the order of input time of all jobs in all queues when jobs
+exist in multiple queues. Jobs are executed in the order of queues
+registered to pbs_server AND in the order of input time in the same
+queue. This means that when strict_fifo is true, the operation behaves
+as round_robin=false, by_queue=true, and sort_queues=false regardless
+of other setting values.<br>
+<br>
+In the following table, rr represents the setting value of round_robin,
+bq represents the setting value of by_queue, sq represents the setting
+value of sort_queues, and sf represents the setting value of
+strict_fifo. Also, F represents false, and T represents True.<br>
+<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">rr<br>
+      </td>
+      <td style="vertical-align: top;">bq<br>
+      </td>
+      <td style="vertical-align: top;">sq<br>
+      </td>
+      <td style="vertical-align: top;">sf<br>
+      </td>
+      <td style="vertical-align: top;">JobSortKey specification with
+PluS<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">JobPriority (Queue is not
+specified)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">SubmitTime (Queue is not
+specified)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, JobPriority<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, SubmitTime<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">ByQueue, JobPriority<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">ByQueue, SubmitTime<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, ByQueue,
+JobPriority &nbsp;&nbsp;&nbsp; (default)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, ByQueue,
+SubmitTime<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">QueueRoundRobin, JobPriority<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">QueueRoundRobin, SubmitTime<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, QueueRoundRobin,
+JobPriority<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">QueuePriority, QueueRoundRobin,
+SubmitTime<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">rr and bq must not be specified
+at the same time<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">same as above<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">F<br>
+      </td>
+      <td style="vertical-align: top;">same as above<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">T<br>
+      </td>
+      <td style="vertical-align: top;">same as above<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+For example, in the default sched_conf, sort_queue and by_queue are set
+to True, others are set to False. To realize the same scheduling as
+this, add the following script to the PluS setting file.<br>
+&nbsp;&nbsp;&nbsp; JobSortKey: QueuePriority, ByQueue, JobPriority<br>
+When the setting file name is not specified, the operation behaves in
+the same way as this.<br>
+<br>
+<h2><a name="3.4_Node_reservability_configuration_by"></a>3.4 Node
+reservability configuration by ClassAd</h2>
+<h3><a name="3.4.1_Abstract"></a>3.4.1 Abstract</h3>
+Normally, PluS selects reservation nodes from all execution nodes which
+satisfy normal reservation conditions.<br>
+You can add custom conditions which are also checked by PluS at node
+allocation.<br>
+Custom condition is written as <a
+ href="http://www.cs.wisc.edu/condor/classad/">ClassAd</a> program,
+which is a part of <a href="http://www.cs.wisc.edu/condor/">Condor</a>.<br>
+Please refer <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node4.html">here</a>
+to know ClassAd evaluation.<br>
+<br>
+Make a "reservable.ad" file in PluS directory (/usr/local/PluS as
+default) which has definition of PLUS_NODE_RESERVABLE.<br>
+<br>
+You can also restrict reservation nodes by -sgeq option of <a
+ href="#plus_scheduler_sgeq">plus_scheduler</a> or <a
+ href="#plus_reserve_sgeq">plus_reserve</a>.<br>
+<h3><a name="3.4.2_Special_variables_for_PluS"></a>3.4.2 Special
+variables for PluS</h3>
+<ul>
+  <li>Special reference variables for PluS, you can refer them in
+reservable.ad file.<br>
+  <ul>
+    <li>PLUS_RSV_OWNER
+    <ul>
+      <li>Reservation request owner's name as string (ex, "userA").<br>
+      </li>
+    </ul></li>
+    <li>PLUS_RSV_START
+    <ul>
+      <li>Requested reservation startTime as <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node3.html#SECTION00031000000000000000">absTime</a>
+(see <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node4.html#SECTION00043400000000000000">here</a>
+also).<br>
+      </li>
+    </ul></li>
+    <li>PLUS_RSV_END
+    <ul>
+      <li>Requested reservation endTime as <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node3.html#SECTION00031000000000000000">absTime.</a></li>
+    </ul></li>
+    <li>PLUS_ALL_NODES
+    <ul>
+      <li>All execution nodes information as <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node4.html#SECTION00043800000000000000">list</a>
+of <a href="#3.4.3_Node_information_struct">Node struct</a> (see
+below).</li>
+    </ul></li>
+    <li>PLUS_ALLOCATED_NODES
+    <ul>
+      <li>All already allocated nodes during allocation of this
+reservation as <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node4.html#SECTION00043800000000000000">list</a>
+of <a href="#3.4.3_Node_information_struct">Node struct</a>.</li>
+    </ul></li>
+    <li>PLUS_CANDIDATE_NODE
+    <ul>
+      <li>Information of a candidate node for allocation as <a
+ href="#3.4.3_Node_information_struct">Node struct</a>.<br>
+      </li>
+    </ul></li>
+  </ul>
+  </li>
+  <li>Special variable <span style="text-decoration: underline;">you
+must always define</span><br>
+  <ul>
+    <li>PLUS_NODE_RESERVABLE
+    <ul>
+      <li>Set true if PLUS_CANDIDATE_NODE is allowed to allocate, false
+if not.</li>
+      <li>PluS evaluates this variable for reservability check.</li>
+      <li>PluS treats all nodes are allowed to allocate if this
+variable is not defined or syntax error occurs in reservable.ad<br>
+      </li>
+    </ul></li>
+  </ul>
+  </li>
+</ul>
+<h3><a name="3.4.3_Node_information_struct"></a>3.4.3 Node information
+struct</h3>
+Node information is expressed as a <a
+ href="http://www.cs.wisc.edu/condor/classad/refman/node4.html#SECTION00043800000000000000">record
+expression of ClassAd</a>.<br>
+It has follow members.<br>
+<ul>
+  <li>name: node name string such as "hostA.example.com"</li>
+  <li>isAlive: boolean value whether this node is alive (running
+sge_execd/pbs_mom now).</li>
+  <li>loadavg: load average of this node as float value</li>
+  <li>nRunJobs: number of running jobs on this node, 0 means this node
+is idle.<br>
+  </li>
+</ul>
+For example, "PLUS_CANDIDATE_NODE.name" means candidate node's name.<br>
+<br>
+NOTE: isAlive/loadavg/nRunJobs are defined by information from
+sge_qmaster/pbs_server.<br>
+They are not just now status, polled periodically every 30~60 sec by
+sge_qmaster/pbs_server.<br>
+<h3><a name="3.4.4_Reservability_check_flow"></a>3.4.4 Reservability
+check flow</h3>
+PluS evaluates PLUS_NODE_RESERVABLE for each nodes as follow.<br>
+<ul>
+  <li>[1] if (valid "reservable.ad" exists)
+  <ul>
+    <li>[1.1] set PLUS_RSV_{OWNER, START, END}<br>
+    </li>
+    <li>[1.2] set PLUS_ALL_NODES as a all execution nodes' information
+list<br>
+    </li>
+    <li>[1.3] set PLUS_ALLOCATED_NODES as a empty list<br>
+    </li>
+  </ul></li>
+  <li>[2] foreach ($node in PLUS_ALL_NODES)<br>
+  <ul>
+    <li>[2.1] if ($node is considered <span
+ style="text-decoration: underline;">not</span> reservable by normal
+reservation conditions)
+    <ul>
+      <li>[2.1.1] continue (to check next node)<br>
+      </li>
+    </ul></li>
+    <li>[2.2] if (valid "reservable.ad" exists)
+    <ul>
+      <li>[2.2.1] set information of $node to PLUS_CANDIDATE_NODE</li>
+      <li>[2.2.2] evaluated PLUS_NODE_RESERVABLE defined in
+reservable.ad</li>
+      <li>[2.2.3] if (evaluated value is <span
+ style="text-decoration: underline;">not</span> true (i.e. false or
+undefined or error))
+      <ul>
+        <li>[2.2.3.1] continue (to check next node)</li>
+      </ul></li>
+    </ul>
+    <ul>
+      <li>[2.2.4] add $node information to PLUS_ALLOCATED_NODES list</li>
+    </ul></li>
+    <li>[2.3] PluS considers that $node is reservable.<br>
+    </li>
+  </ul>
+  </li>
+</ul>
+"Normal reservation conditions" checks whether a $node<br>
+<ul>
+  <li>has already
+reserved in same period</li>
+  <li>satisfies requested resources<br>
+  </li>
+  <li>has queue instances of the queues which specified at <a
+ href="#plus_reserve_sgeq">plus_reserve</a> of <a
+ href="#plus_scheduler_sgeq">plus_scheduler</a> (SGE queue base version
+only)</li>
+  <li>is allowed to access by queue's ACL[Access Control List] (SGE
+self scheduling version only)<br>
+  </li>
+</ul>
+You cannot change these normal conditions by ClassAd.<br>
+<br>
+<h3><a name="3.4.5_Sample_ClassAd_definitions"></a>3.4.5 Sample ClassAd
+definitions</h3>
+You can use PluS/conf/reservable.ad.sample* files as template, which
+are copied to /usr/local/PluS when setup PluS.<br>
+<h4>3.4.5.1 Check node status<br>
+</h4>
+A candidate node is reservable if<br>
+<ul>
+  <li>jobs are not running now on this node, and<br>
+  </li>
+  <li>it's alive now, and</li>
+  <li>load average of this node is less or equal 0.3, and</li>
+  <li>node name isn't included in UnusableNodes ("unusableA" and
+"unusableB").<br>
+  </li>
+</ul>
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">[</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+UnusableNodes = { "unusableA", "unusableB" };</span><br
+ style="font-family: courier new,courier,monospace;">
+      <br style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+PLUS_NODE_RESERVABLE = </span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; (PLUS_CANDIDATE_NODE.nRunJobs == 0 &amp;&amp; </span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;PLUS_CANDIDATE_NODE.isAlive &amp;&amp;</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;PLUS_CANDIDATE_NODE.loadavg &lt;= 0.3
+&amp;&amp;</span><br style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;!member(PLUS_CANDIDATE_NODE.name,
+UnusableNodes));</span><br
+ style="font-family: courier new,courier,monospace;">
+      <span style="font-family: courier new,courier,monospace;">]</span><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4>3.4.5.2 Change reservability by how long until reservation start</h4>
+Restrict number of reservable nodes by owner or how long until
+reservation start.<br>
+<br>
+Define reservability percentage as follow graph.<br>
+All users cannot reserve if startTime is before now or startTime is
+after "now+LimitedPeriod" and reservation duration is longer than
+MaxReservationDuration.<br>
+If reservability is 80%, 80% of number of all execution nodes are
+reservable.<br>
+<br>
+VIPs members can reserve 100% nodes. If you are in Users group,
+reservability is<br>
+<ul>
+  <li>UsersMaxRatio (=90%) if "now &lt; PLUS_RSV_START &lt;= now +
+MaxPeriod"</li>
+  <li>UsersMinRatio (=50%) if "now + MinPeriod &lt;= PLUS_RSV_START
+&lt; now + LimitedPeriod".</li>
+  <li>If "now + MaxPeriod &lt; PULS_RSV_START &lt; now + MinPeriod",
+reservability decreases linearly.<br>
+  </li>
+</ul>
+<div style="text-align: center;">
+<div style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img alt="" src="reservability.gif"
+ style="border: 1px solid ; width: 706px; height: 352px;"><br>
+<br>
+</div>
+<div style="text-align: left;">These conditions are defined by ClassAd
+as follow.<br>
+<br>
+</div>
+</div>
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">[<br>
+&nbsp;&nbsp;&nbsp; MaxPeriod = relTime("00:30:00");<br>
+&nbsp;&nbsp;&nbsp; MinPeriod = relTime("02:00:00");<br>
+&nbsp;&nbsp;&nbsp; LimitPeriod = relTime("7d");<br>
+&nbsp;&nbsp;&nbsp; MaxReserveDuration = relTime("2d");<br>
+&nbsp;&nbsp;&nbsp; VIPs = { "userA", "userB", "userC" };<br>
+&nbsp;&nbsp;&nbsp; Users = { "userX" };<br>
+&nbsp;&nbsp;&nbsp; VIPRatio = 100.0;<br>
+&nbsp;&nbsp;&nbsp; UsersMaxRatio = 90.0;<br>
+&nbsp;&nbsp;&nbsp; UsersMinRatio = 50.0;<br>
+&nbsp;&nbsp;&nbsp; OthersMaxRatio = 50.0;<br>
+&nbsp;&nbsp;&nbsp; OthersMinRatio = 30.0;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; MaxRatio = member(PLUS_RSV_OWNER, Users) ?
+UsersMaxRatio : OthersMaxRatio;<br>
+&nbsp;&nbsp;&nbsp; MinRatio = member(PLUS_RSV_OWNER, Users) ?
+UsersMinRatio : OthersMinRatio;<br>
+&nbsp;&nbsp;&nbsp; now = absTime(time());<br>
+&nbsp;&nbsp;&nbsp; prev = PLUS_RSV_START - now;<br>
+&nbsp;&nbsp;&nbsp; duration = PLUS_RSV_END - PLUS_RSV_START;<br>
+&nbsp;&nbsp;&nbsp; ratioFunc = linear(prev, MaxPeriod, MaxRatio,
+MinPeriod, MinRatio);<br>
+&nbsp;&nbsp;&nbsp; rsvRatio = <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; (prev &lt;= relTime("0") ||
+LimitPeriod &lt;= prev || duration &gt;= MaxReserveDuration) ? 0 :<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; member(PLUS_RSV_OWNER, VIPs) ?
+VIPRatio :<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; (prev &lt;= MaxPeriod) ? MaxRatio
+:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; (prev &gt;= MinPeriod) ? MinRatio
+: ratioFunc;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; nAllocate = size(PLUS_ALLOCATED_NODES) + 1;<br>
+&nbsp;&nbsp;&nbsp; nAllocatable = size(PLUS_ALL_NODES) * 0.01 *
+rsvRatio;<br>
+&nbsp;&nbsp;&nbsp; PLUS_NODE_RESERVABLE = (nAllocate &lt;=
+nAllocatable);<br>
+]<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+In this Class Ad, we define<br>
+&nbsp; MaxPeriod = 30 minutes, MinPeriod = 2 hours, LimitPeriod = 7 days
+= 24 * 7 hours,&nbsp; MaxReserveDuration = 2 days = 24 * 2 hours.<br>
+&nbsp; VIPs members are userA, userB, and userC.<br>
+&nbsp; Users members are userX.<br>
+<br>
+If you are "userA",<br>
+<ul>
+  <li>50% (=UsersMaxRatio) nodes are reservable if a new reservation
+will start
+within 30 minutes (=MaxPeriod).</li>
+  <li>50~30%(=UsersMinRatio) nodes are reservable if a new reservation
+will start
+within 2 hours (=MinPeriod).</li>
+  <li>30% (=UsersMinRatio) nodes are reservable if a new reservation
+will start
+within 2 hours (=MinPeriod). <br>
+  </li>
+  <li>You cannot reserve if
+  <ul>
+    <li>reservation startTime is already passed, or<br>
+    </li>
+    <li>reservation will start 7 days (=LimitedPeriod) later, or</li>
+    <li>reservation duration (deference between startTime and endTime)
+is longer or equal 2 days (=MaxReserveDuration).<br>
+    </li>
+  </ul></li>
+</ul>
+linear() and quadratic() is build-in function defined by PluS.<br>
+linear(x, x1, y1, x2, y2) returns value of linear function f(x), which
+satisfy y1 = f(x1) and y2 = f(x2).<br>
+If you want to use quadratic function, use quadratic() in same way.<br>
+<br>
+<h4>3.4.5.3 Restrict maximum reservation usage</h4>
+You can make a new reservation if<br>
+<ul>
+  <li>number of your reservation during 7days(=UtilCheckPeriod) before
+and 7days after is less or equal 100(=MaxReserveCount), and<br>
+  </li>
+  <li>total reservation duration in that period is less or equal
+2days(=2*24hours=MaxReserveDuration), and<br>
+  </li>
+  <li>total "HourNode" in that period is less or equal 1000.0
+(=MaxReserveHourNode).<br>
+"HourNode" is reservation duration in hour times reserved node number.<br>
+For Example, if you reserve 4 nodes during 10 hours, it's a 40 HourNode
+reservation.<br>
+  </li>
+</ul>
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">[<br>
+&nbsp;&nbsp;&nbsp; UtilCheckPeriod = relTime("7d");<br>
+&nbsp;&nbsp;&nbsp; MaxReserveCount = 100;<br>
+&nbsp;&nbsp;&nbsp; MaxReserveDuration = relTime("2d");<br>
+&nbsp;&nbsp;&nbsp; MaxReserveHourNode = 1000.0;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; now = absTime(time());<br>
+&nbsp;&nbsp;&nbsp; util = plus_rsvutil(PLUS_RSV_OWNER,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; now - UtilCheckPeriod, now +
+UtilCheckPeriod);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; PLUS_NODE_RESERVABLE = <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ((util[0] &lt;= MaxReserveCount)
+&amp;&amp;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(util[1] &lt;=
+MaxReserveDuration) &amp;&amp;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(util[2] &lt;=
+MaxReserveHourNode));<br>
+]</span><span style="font-family: courier new,courier,monospace;"></span><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+plus_rsvutil(owner, start, end) returns a list of values<br>
+<ul>
+  <li>1st value is number of owner's reservations during start and end.</li>
+  <li>2nd value is total reservation durations of owner during start
+and end.</li>
+  <li>3rd value is total "HourNode" of&nbsp; owner's reservations
+during start and end.<br>
+  </li>
+</ul>
+<h4>3.4.5.4 Restrict nodes for each users groups</h4>
+<ul>
+  <li>If you are Proj1Users member, you can reserve nodes in
+Proj1Nodes.</li>
+  <li>If you are Proj2Users member, you can reserve nodes in
+Proj2Nodes.</li>
+  <li>If you are not in Proj1Users and Proj2Users, you cannot reserve
+any nodes.<br>
+  </li>
+</ul>
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">[<br>
+&nbsp;&nbsp;&nbsp; Proj1Users = { "userA", "userB" };<br>
+&nbsp;&nbsp;&nbsp; Proj1Nodes = { "node1", "node2" };<br>
+&nbsp;&nbsp;&nbsp; Proj2Users = { "userA", "userC" };<br>
+&nbsp;&nbsp;&nbsp; Proj2Nodes = { "node3", "node4" };<br>
+      <br>
+&nbsp;&nbsp;&nbsp; avail1 = member(PLUS_RSV_OWNER, Proj1Users)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;?
+member(PLUS_CANDIDATE_NODE.name, Proj1Nodes) : false;<br>
+&nbsp;&nbsp;&nbsp; avail2 = member(PLUS_RSV_OWNER, Proj2Users)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;?
+member(PLUS_CANDIDATE_NODE.name, Proj2Nodes) : false;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; PLUS_NODE_RESERVABLE = (avail1 || avail2);<br>
+]<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+"userA" is included in both Proj1Users and Proj2Users, so "userA" can
+reserve nodes both in both Proj1Nodes and Proj2Nodes.<br>
+<h2><a name="Files_related_to_execution"></a>3.5 Files related to
+execution</h2>
+<ul>
+  <li>Reservation DB file (reserves.db4o)<br>
+  <ul>
+    <li>A file, /usr/local/PluS/reserves.db4o, is created on
+the node where the Java scheduler (plus_scheduler) was started as
+default. This is a directory where ${plus.jar} and others are installed.</li>
+    <li>To change the storage path, use plus_scheduler -r /some/where
+at startup. A file, /some/where/reserves.db4o, will be created.</li>
+    <li>All reservations are erased when this file is manually deleted,
+and the scheduler is re-started.</li>
+    <li>In db4o, there is a class called com.db4o.tools.Defragment
+providing a defragment function. However, this is not compiled as
+default, and its use is not recommended.</li>
+  </ul>
+  </li>
+  <li>Debug log file (plus.log)<br>
+  <ul>
+    <li>PluS debug log is recorded in
+/usr/local/PluS/plus.log as default.</li>
+    <li>Record file name and record level can be changed by modifying
+PluS/conf/log4j.properties.<br>
+Execute ant; ant install after modifying this file.</li>
+  </ul>
+  </li>
+  <li>Reservation operation log text (reserves.log)<br>
+  <ul>
+    <li>Successfully committed reservation operation is recorded in
+/usr/local/PluS/reserves.log as default.</li>
+    <li>Failed or aborted reservation operation isn't recorded.<br>
+    </li>
+    <li>One line shows one reservation operation.</li>
+    <li>One line has follow values separated by "!", not by ",".<br>
+    <ul>
+      <li>committed time as "yyyyMMDDhhmmss{+-}zzzz" (ex:
+"20061215135412+0900")</li>
+      <li>operation name within "reserve", "cancel", "modify",
+"destroy".</li>
+      <li>reservation ID of target operation</li>
+      <li>reservation owner</li>
+      <li>reservation users (separated users by white space " " if
+multiple)</li>
+      <li>reservation start time as "yyyyMMDDhhmmss{+-}zzzz"</li>
+      <li>reservation end time as "yyyyMMDDhhmmss{+-}zzzz"</li>
+      <li>reserved node names (separated nodes by white space " " if
+multiple)
+      <ul>
+        <li>the value is "" (empty string) at "cancel" and "destroy"
+operations</li>
+      </ul></li>
+      <li>reservation options specified by plus_reserve (separated
+values by white space " " if multiple).
+      <ul>
+        <li>"plus_reserve ... -os Linux -sgeq A.q,B.q" makes "os=Linux
+sgeqname=A.q,B.q" as option value text.<br>
+It contains ",", so we use "!" for separator of log line.</li>
+      </ul></li>
+    </ul>
+    </li>
+  </ul>
+  </li>
+  <li>Node reservability configuration (reservable.ad, optional)<br>
+  <ul>
+    <li>/usr/local/PluS/reservable.ad is evaluated for node
+reservability check.</li>
+    <li>See <a href="#3.4_Node_reservability_configuration_by">here</a>.</li>
+  </ul>
+  </li>
+  <li>Scheduler configuration (sched_conf, optional)
+  <ul>
+    <li>/usr/local/PluS/sched_conf is evaluated for self scheduling
+configuration.</li>
+    <li>See <a href="#Job_scheduling_algorithm">here</a>.<br>
+    </li>
+  </ul>
+  </li>
+</ul>
+<h2><a name="Improvements_of_Torque_authentication"></a>3.6
+Improvements of
+Torque authentication program</h2>
+pbs_iff command generated from the original iff2.c has the following
+options.<br>
+<ul>
+  <li>pbs_iff server name port number sockfd
+  <ul>
+    <li>Server name&nbsp;&nbsp;&nbsp; pbs_server startup host name</li>
+    <li>Port number&nbsp;&nbsp;&nbsp; Port of pbs_server (15001 as
+default)</li>
+    <li>sockfd&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; File descriptor
+number of the socket to be authenticated when a command invoking
+pbs_iff is already connected to pbs_server.<br>
+    </li>
+  </ul></li>
+</ul>
+<br>
+Since a file descriptor number cannot be obtained with Java, the
+specifications were changed as follows:<br>
+<ul>
+  <li>pbs_iff server name port number fd_port
+  <ul>
+    <li>Server name&nbsp;&nbsp;&nbsp; Same as original</li>
+    <li>Port number&nbsp;&nbsp;&nbsp; Same as original</li>
+    <li>fd_port
+    <ul>
+      <li>Same as original if the value is smaller than 1024.</li>
+      <li>If greater than 1024, a socket number is to be authenticated<br>
+      </li>
+    </ul></li>
+  </ul></li>
+</ul>
+From the Java scheduler, execute pbs_iff by specifying a port number.<br>
+Original commands (qsub, etc.) previously using pbs_iff can be
+authenticated with this improved pbs_iff in the same way as before.<br>
+<br>
+Changes in the sources are described as follows:<br>
+&nbsp; #ifdef ORIGINAL<br>
+&nbsp;&nbsp;&nbsp; Original source<br>
+&nbsp; #else<br>
+&nbsp;&nbsp;&nbsp; Changed source<br>
+&nbsp; #endif<br>
+<br>
+
+<h2><a name="sge_operatord"></a>3.7 sge_operatord</h2>
+<h3><a name="sge_operatord_abstract"></a>3.7.1 abstract</h3>
+sge_operatord is used on SGE self scheduling version.<br>
+It gets requests from PluS by simple text through a socket, and call GDI 
+(Gridengine Database Interface) functions to operate SGE.<br>
+<br>
+sge_operatord has two perposes, to get all of SGE status information and to operate jobs.
+
+sge_operatord opens port 16000 as default, which can change by first argument of it.
+It doesn't any authentication at connecting to PluS and sge_qmaster, but SGE checks whether 
+request user (a user who launched sge_operatord) is in admin user list (showed by qconf -sm)
+before job operations.
+
+<h3><a name="sge_operatord_protocol"></a>3.7.2 protocol</h3>
+<h4><a name="sge_operatord_protocol_status"></a>3.7.2.1 getting status protocl</h4>
+<ul>
+  <li>Request text: "GetStatus <span style="font-style: italic;">status_type_name</span>"</li>
+  <li>Reply text: XML text (suceeded) or one line error message.</li>
+</ul>
+
+Below words are valid as status_type_name.
+ 
+<table style="text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+    <tbody>
+      <tr>
+        <td style="vertical-align: top;">status_type_name<br>
+        </td>
+        <td style="vertical-align: top;">description<br>
+        </td>
+        <td style="vertical-align: top;">almost same command<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">server<br>
+        </td>
+        <td style="vertical-align: top;">admin hosts<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sh<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">submithost<br>
+        </td>
+        <td style="vertical-align: top;">submit hosts<br>
+        </td>
+        <td style="vertical-align: top;">qconf -ss<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">node<br>
+        </td>
+        <td style="vertical-align: top;">exec node names<br>
+        </td>
+        <td style="vertical-align: top;">qhost<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">queue<br>
+        </td>
+        <td style="vertical-align: top;">queues<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sql<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">job<br>
+        </td>
+        <td style="vertical-align: top;">jobs<br>
+        </td>
+        <td style="vertical-align: top;">qstat<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">complex<br>
+        </td>
+        <td style="vertical-align: top;">resource definitions<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sc<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">pe<br>
+        </td>
+        <td style="vertical-align: top;">Parallel environments<br>
+        </td>
+        <td style="vertical-align: top;">qconf -spl<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">sched_conf<br>
+        </td>
+        <td style="vertical-align: top;">SGE scheduler configuraion<br>
+        </td>
+        <td style="vertical-align: top;">qconf -ssconf<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">user<br>
+        </td>
+        <td style="vertical-align: top;">user list<br>
+        </td>
+        <td style="vertical-align: top;">qconf -suserl<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">userset<br>
+        </td>
+        <td style="vertical-align: top;">userset list<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sul<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">project<br>
+        </td>
+        <td style="vertical-align: top;">project list<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sprjl<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">sharetree<br>
+        </td>
+        <td style="vertical-align: top;">sharetree information<br>
+        </td>
+        <td style="vertical-align: top;">qconf -sstree<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">calendar<br>
+        </td>
+        <td style="vertical-align: top;">calendar information<br>
+        </td>
+        <td style="vertical-align: top;">qconf -scall<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">hgroup<br>
+        </td>
+        <td style="vertical-align: top;">host group list<br>
+        </td>
+        <td style="vertical-align: top;">qconf -shgrpl<br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   </li>     
+  </ul>
+</ul>
+
+Replied XML has really all of internal SGE information, which not shown normally by 'qstat -xml' etc.
+<br>
+Unfortunately, XML made by SGE's function (lWriteElemXMLTo()) sometimes has invalid tags and
+same tag names for different data structures.
+PluS (Java module, not sge_operatord itself) makes it to valid XML before parsing by JAXB.
+Sample XMLs and XSDs are in PluS/src/jp/aist/gtrc/plus/scheduler/specific/sge/jaxb/schema.
+These XSDs only support important tags which are referenced by PluS, other tags are ignored.
+
+<h4><a name="sge_operatord_protocol_operate"></a>3.7.2.2 operating jobs protocol</h4>
+<ul>
+  <li>Request text: "<span style="font-style: italic;">Operation_name</span>
+   <span style="font-style: italic;">jobid</span>
+   <span style="font-style: italic;">[args...]</span>"</li>
+  <li>Reply text: "OK" or one line error message.</li>
+</ul>
+
+<ul>
+  <li>run the job (task) on specified nodes (queue instances)
+  <ul>
+     <li>Format: RunJob <span style="font-style: italic;">jobid</span> 
+      <span style="font-style: italic;">qInstance</span> 
+      <span style="font-style: italic;">qVersion</span>
+      <span style="font-style: italic;">qSlot</span>
+      [<span style="font-style: italic;">[qInstance qVersion qSlot]...</span>]
+      [<span style="font-style: italic;">PEnams</span>]
+       <ul>
+         <li>jobid: job and task id (ex: "100.1")</li>
+         <li>qInstance: queue instance name (ex: "all.q@host00.exmaple.com")</li>
+         <li>qVersion: queue instance version, which is incremented when queue's configuration was changed.
+         This value must be a correct value because it's checked by sge_qmaster.
+         It can available by "GetStatus queue" output. In below sample, qVersion of all.q@host00.example.com is 3.
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span
+ style="font-family: courier new,courier,monospace;">
+% sge_operatord 16000 &amp;<br>
+% telnet localhost 16000<br>
+GetStatus queue<br>
+&lt;?xml version='1.0'?&gt;<br>
+&lt;queue_list&nbsp; xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;<br>
+&nbsp; &lt;CQUEUE:&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;CQ_name&gt;all.q&lt;/CQ_name&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;CQ_hostlist&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;element&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;HR_name&gt;@allhosts&lt;/HR_name&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/element&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/CQ_hostlist&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;CQ_qinstances&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;QINSTANCE:all.q/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;QU_qhostname&gt;host00.example.com&lt;/QU_qhostname&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;QU_qname&gt;all.q&lt;/QU_qname&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;QU_full_name&gt;all.q@host00.example.com&lt;/QU_full_name&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;QU_version&gt;<span style="font-weight: bold;">3</span>&lt;/QU_version&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/QINSTANCE:all.q/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ....<br>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+         </li>
+         <li>qSlot: using number of queue slots (1 or more).</li>
+         <li>PEname: PE name such as "mpich" to run parallel jobs.</li>
+       </ul>
+     </li>
+     <li>Sample request text
+       <ul>
+           <li>"RunJob 100.1 all.q@host00.example.com 3 1"</li>
+           <ul>
+               <li>run the task 100.1 on all.q@host00.example.com using 1 slot.
+           </ul>
+           <li>"RunJob 200.1 all.q@host00.example.com 3 1 all.q@host01.example.com 3 1 mpich"</li>
+           <ul>
+               <li>run the paralell task 200.1 using mpich PE environment on both of all.q@host00.example.com and all.q@host01.example.com using 1 slot per each queue.
+           </ul>
+       </ul>
+     </li>                       
+  </ul>
+  </li>
+  <li>delete (kill if running) job
+  <ul>
+    <li>Format: DeleteJob <span style="font-style: italic;">jobid</span></li>
+    <li>Sample request text
+       <ul>
+           <li>"DeleteJob 100.1"</li>
+       </ul>
+     </li>                       
+  </ul>
+  </li>
+  <li>expire job after job stop
+  <ul>
+    <li>Format: ExpireJob <span style="font-style: italic;">jobid</span></li>
+    <li>SGE has job information until 'ExpireJob' calls even if job stopped/finished. You must clear the job information by ExprireJob.</li>
+  </ul>
+  </li>
+  <li>susupend job (same as qmod -sj jobid)
+  <ul>
+    <li>Format: SuspendJob <span style="font-style: italic;">jobid</span></li>
+  </ul>
+  </li>
+  <li>resume job (same as qmod -usj jobid)
+  <ul>
+    <li>Format: ResumeJob <span style="font-style: italic;">jobid</span></li>
+  </ul>
+  </li>
+  <li>hold job (same as qhold jobid)
+  <ul>
+    <li>Format: HoldJob <span style="font-style: italic;">jobid</span></li>
+  </ul>
+  </li>
+  <li>release job (same as qrls jobid)
+  <ul>
+    <li>Format: ReleaseJob <span style="font-style: italic;">jobid</span></li>
+  </ul>
+  </li>
+  <li>resubmit job
+  <ul>
+    <li>Format: ResubmitJob <span style="font-style: italic;">jobid</span> <span style="font-style: italic;">owner</span> <span style="font-style: italic;">uid</span> <span style="font-style: italic;">group</span> <span style="font-style: italic;">gid</span></li>
+    <li>Same operaions such as
+       <ul>
+          <li>sudo -u owner qresub jobid</li>
+          <li>qdel jobid</li>
+       </ul>
+     </li>
+  </ul>
+  </li>
+  
+</ul>
+
+<h4><a name="sge_operatord_protocol_shutdown"></a>3.7.2.3 disconnect and shutdown</h4>
+<ul>
+  <li>disconnect from sge_operatord
+  <ul>
+    <li>Format: Bye</li>
+  </ul>
+  </li>
+  <li>shutdown sge_operatord
+  <ul>
+    <li>Format: Shutdown</li>
+  </ul>
+  </li>
+</ul>
+ 
+<br>
+<br>
+<br>
+<p>
+<a href="http://validator.w3.org/"><img
+    src="http://www.w3.org/Icons/valid-html401"
+    alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+</p>
+
+</body>
+</html>
